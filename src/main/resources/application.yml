@@ -1,0 +1,16 @@
+server:
+  contextPath: /api
+  port: 8088
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://54.223.243.21:3306/mt4_gold?useSSL=false&characterEncoding=UTF-8
+    username: mtk_bj_db
+    password: mtk_bj_db
+    driver-class-name: com.mysql.jdbc.Driver
+juniter:
+  email: juniterr@outlook.com
