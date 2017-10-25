@@ -1,5 +1,12 @@
 Configuration:
   status: info
+  name: Log4j2 Yaml Config
+  properties:
+    property:
+    - name: ArchiveFileName
+      value: log/archive/
+    - name: filename
+      value: log/gold
   Appenders:
     Console:
       name: DefaultConsoleAppender
@@ -8,16 +15,39 @@ Configuration:
         pattern: |
           %style{%date{DEFAULT}}{yellow}%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green}%message
     File:
-      name: DefaultFileAppender
-      file-name: log/javabs.log
-      immdiateFlush: true
+    - name: DefaultFileAppender
+      fileName: ${filename}-all.log
       PatternLayout:
         pattern: |
           %date-%-5level-%message
+      Filters:
+        ThresholdFilter:
+          level: info
+    - name: WarnningFileAppender
+      fileName: ${filename}-warn.log
+      PatternLayout:
+        pattern: |
+          %date-%-5level-%message
+      Filters:
+        ThresholdFilter:
+          level: warn
+    RollingFile:
+    - name: ArchiveFileAppender
+      fileName: ${filename}-rolling.log
+      filePattern: ${ArchiveFileName}-%d{yyyy-MM-dd-HH}-%i.log.zip
+      PatternLayout:
+        pattern: '%d %p %c{1.} [%t] %m%n'
+      Policies:
+        SizeBasedTriggeringPolicy: 
+          size: 10 MB
   Loggers:
     Root:
       level: info
-      AppenderRef: DefaultConsoleAppender
+      AppenderRef:
+      - ref: DefaultConsoleAppender
+      - ref: DefaultFileAppender
+      - ref: WarnningFileAppender
+      - ref: ArchiveFileAppender
     Logger:
       name: SYNC_FILE_LOGGER
       level: warn
