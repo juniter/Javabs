@@ -1,9 +1,8 @@
-package com.juniter.javabs;
+package com.juniter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Component
 @ConfigurationProperties(prefix = "juniter")
 public class DefaultConfiguration {
 	private String email;

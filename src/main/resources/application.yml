@@ -1,6 +1,8 @@
 server:
   contextPath: /api
   port: 8088
+logging:
+  config: log4j2.yml
 spring:
   jpa:
     hibernate:
