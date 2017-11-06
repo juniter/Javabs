@@ -1,7 +1,6 @@
-package com.juniter;
+package com.juniter.conf;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "juniter")
 public class DefaultConfiguration {

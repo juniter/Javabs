@@ -1,5 +1,5 @@
 Configuration:
-  status: info
+  status: INFO
   name: Log4j2 Yaml Config
   properties:
     property:
@@ -42,7 +42,7 @@ Configuration:
           size: 10 MB
   Loggers:
     Root:
-      level: info
+      level: TRACE
       AppenderRef:
       - ref: DefaultConsoleAppender
       - ref: DefaultFileAppender
