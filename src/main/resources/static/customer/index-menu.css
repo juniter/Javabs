@@ -194,6 +194,7 @@ nav ul, nav li {
 	position: relative;
 	z-index: 99;
 	height: 100%;
+	overflow:auto;
 	background-color:#eaeaea;
 	-webkit-transition: -webkit-transform 0.6s;
 	transition: transform 0.6s;
