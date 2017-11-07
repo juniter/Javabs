@@ -12,7 +12,7 @@ public class HttpClientTest {
 	public void testGet() throws MalformedURLException {
 		Map<String,String> map = new HashMap<>();
 		map.put("name", "Juniter");
-		map.put("password", "JunitersPassword");
+		map.put("password", "Juniter sPa ssword");
 		HttpClient client = new HttpClient();
 		String response = client.setUrl("http://localhost:8088/test/example").setRequestHeader(new Header()).get(map);
 		System.out.println("#######################");

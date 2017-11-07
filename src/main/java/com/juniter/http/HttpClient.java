@@ -3,9 +3,11 @@ package com.juniter.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -100,15 +102,22 @@ public class HttpClient implements HttpExecuter {
 	 * 
 	 * @param url
 	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException 
 	 * 
 	 * 
 	 */
-	private void setRealURL(Map<String, String> params) throws MalformedURLException {
+	private void setRealURL(Map<String, String> params) throws MalformedURLException{
 		if (params != null) {
 			StringBuffer urlBuffer = new StringBuffer(url);
 			urlBuffer.append("?");
 			Set<String> keySet = params.keySet();
-			keySet.forEach((key) -> urlBuffer.append(key).append("=%22").append(params.get(key)).append("%22&"));
+			keySet.forEach((key) -> {
+				try {
+					urlBuffer.append(key).append("=%22").append(URLEncoder.encode(params.get(key), "UTF-8")).append("%22&");
+				} catch (UnsupportedEncodingException e) {
+					logger.warn("Failed To Encode URL:{}",e.getMessage());
+				}
+			});
 			urlBuffer.append("dc_").append("=%22").append(System.currentTimeMillis()).append("%22");
 			this.realURL = new URL(urlBuffer.toString());
 			logger.info("Request URL:{}", urlBuffer.toString());
