@@ -31,6 +31,14 @@ Configuration:
       Filters:
         ThresholdFilter:
           level: warn
+    - name: HTTP_REQUEST_LOGGER
+      fileName: ${filename}-http.log
+      PatternLayout:
+        pattern: |
+          %message
+      Filters:
+        ThresholdFilter:
+          level: info
     RollingFile:
     - name: ArchiveFileAppender
       fileName: ${filename}-rolling.log
@@ -48,7 +56,11 @@ Configuration:
       - ref: DefaultFileAppender
       - ref: WarnningFileAppender
       - ref: ArchiveFileAppender
+      - ref: HTTP_REQUEST_LOGGER
     Logger:
-      name: SYNC_FILE_LOGGER
+    - name: SYNC_FILE_LOGGER
       level: warn
+      additivity: true
+    - name: HTTP_REQUEST_LOGGER
+      level: info
       additivity: true
