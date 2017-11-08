@@ -27,7 +27,7 @@ public class HttpClient implements HttpExecuter {
 	private String url;
 	private URL realURL;
 	private Header requestHeader;
-	private HttpMethod currentMethod;
+	private HttpMethod method;
 
 	/**
 	 * @author Juniter Http Get Method
@@ -36,14 +36,14 @@ public class HttpClient implements HttpExecuter {
 	 */
 	@Override
 	public String get(Map<String, String> map) {
-		this.currentMethod = HttpMethod.GET;
+		this.method = HttpMethod.GET;
 		logger.info("Request Method:  {}", HttpMethod.GET);
 		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
 		try {
 			this.setGetMethodURL(map);
 			this.connection = this.realURL.openConnection();
-			this.setHeader(this.requestHeader);
+			this.initHeader();
 			this.connection.connect();
 			this.logResponseHeader(connection.getHeaderFields());
 			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream(), "UTF-8"));
@@ -72,15 +72,15 @@ public class HttpClient implements HttpExecuter {
 	@Override
 	public <T> String post(T t) {
 		logger.info("Request Method:  {}", HttpMethod.POST);
-		logger.info("URL:{}",this.url);
-		this.currentMethod = HttpMethod.POST;
+		logger.info("URL:{}", this.url);
+		this.method = HttpMethod.POST;
 		PrintWriter printer = null;
 		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
 		try {
 			this.realURL = new URL(this.url);
 			this.connection = this.realURL.openConnection();
-			this.setHeader(this.requestHeader);
+			this.initHeader();
 			printer = new PrintWriter(this.connection.getOutputStream());
 			// send json request
 			printer.print(new Gson().toJson(t));
@@ -105,47 +105,53 @@ public class HttpClient implements HttpExecuter {
 		return response.toString();
 	}
 
-	@Override
-	public <T> String delete(T t) {
-		return null;
-	}
-
-	@Override
-	public <T> String put(T t) {
-		return null;
-	}
-
 	/**
-	 * Set Http Request Header
+	 * set request header
 	 * 
 	 * @param header
 	 * @return
 	 * 
 	 */
-	private HttpClient setHeader(Header header) {
-		Map<String, String> headerMap = header.toMap();
+	private void initHeader() {
+		Map<String, String> headerMap = this.requestHeader.getCommonHeaderMap();
 		Set<String> keySet = headerMap.keySet();
 		keySet.forEach((key) -> {
 			this.connection.setRequestProperty(key, headerMap.get(key));
 		});
-		
-		if (this.currentMethod.equals(HttpMethod.POST)) {
-			this.connection.setRequestProperty("Content-Type", header.getContentType());
-			this.connection.setDoOutput(true);
-			this.connection.setDoInput(true);
-		}
-		
-		logger.info("HEADER:\n\tAccept:  {}\n\tAccept-Encoding:  {}\n\tUser-Agent:  {}\n\tConnection:  {}\n\tContent-Type:  {}",header.getAccept(), header.getAcceptEncoding(), header.getUserAgent(), header.getConnection(),header.getContentType());
-		return this;
+		if (this.method.equals(HttpMethod.POST))
+			this.initPOSTHeader();
+		else if (this.method.equals(HttpMethod.GET))
+			this.initGETHeader();
+		this.logRequestHeader();
 	}
 
 	/**
-	 * Get Reqeust URL
+	 * log request logger
 	 * 
-	 * @return
 	 */
-	public String getRequestURL() {
-		return realURL == null ? "" : realURL.toExternalForm();
+	private void logRequestHeader() {
+		Map<String, String> headerMap = this.requestHeader.getAllHeaderMap();
+		Set<String> keySet = headerMap.keySet();
+		keySet.forEach((key) -> {
+			logger.info(key.toUpperCase() + ": {}", headerMap.get(key));
+		});
+	}
+
+	/**
+	 * 
+	 * set post method header
+	 * 
+	 */
+	private void initPOSTHeader() {
+		this.connection.setRequestProperty("Content-Type", this.requestHeader.getContentType());
+		this.connection.setDoOutput(true);
+		this.connection.setDoInput(true);
+	}
+
+	/**
+	 * set get method header
+	 */
+	private void initGETHeader() {
 	}
 
 	/**
@@ -162,7 +168,7 @@ public class HttpClient implements HttpExecuter {
 			urlBuffer.append("?");
 			Set<String> keySet = params.keySet();
 			keySet.forEach((key) -> {
-				String encodeParam = this.getEncodeURLParam(params.get(key));
+				String encodeParam = this.encodeRequestParams(params.get(key));
 				urlBuffer.append(key).append("=").append(encodeParam).append("&");
 			});
 			this.setRandomParameter(urlBuffer);
@@ -180,14 +186,13 @@ public class HttpClient implements HttpExecuter {
 	 * @return
 	 * 
 	 */
-	private String getEncodeURLParam(String param) {
+	private String encodeRequestParams(String param) {
 		StringBuffer temp = new StringBuffer("%22");
 		try {
 			String value = URLEncoder.encode(param, "UTF-8");
-			// add %22 block
 			temp.append(value).append("%22");
 		} catch (UnsupportedEncodingException e) {
-			logger.warn("FAILED ENCODE PARAM:{}, CAUSE FOR:", param,e.getMessage());
+			logger.warn("FAILED ENCODE PARAM:{}, CAUSE FOR:", param, e.getMessage());
 		}
 		return temp.toString();
 	}
@@ -202,15 +207,13 @@ public class HttpClient implements HttpExecuter {
 	}
 
 	private void logResponseHeader(Map<String, List<String>> map) {
-		if (map != null) {
-			Set<String> keySet = map.keySet();
-			keySet.forEach((rh) -> {
-				if (rh == null)
-					logger.info("HTTP:  {}", map.get(null));
-				else
-					logger.info("{}:  {}", rh, map.get(rh.toString()));
-			});
-		}
+		Set<String> keySet = map.keySet();
+		keySet.forEach((rh) -> {
+			if (rh==null)
+				logger.info("HTTP:  {}", map.get(rh));
+			else
+				logger.info(rh.toUpperCase()+": {}",map.get(rh));
+		});
 	}
 
 	/**

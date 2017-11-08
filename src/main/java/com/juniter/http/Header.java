@@ -59,12 +59,28 @@ public class Header {
 		this.userAgent = userAgent;
 	}
 
-	public Map<String, String> toMap() {
+	/**
+	 * add common header into a map
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getCommonHeaderMap() {
 		Map<String, String> map = new HashMap<>();
 		map.put("Accept", this.accept);
 		map.put("Accept-Encoding", this.acceptEncoding);
 		map.put("User-Agent", this.acceptEncoding);
 		map.put("Connection", this.userAgent);
+		return map;
+	}
+	
+	/**
+	 * add a header into a map
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getAllHeaderMap() {
+		Map<String, String> map =this.getCommonHeaderMap();
+		map.put("Content-Type", this.contentType);
 		return map;
 	}
 

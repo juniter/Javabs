@@ -11,6 +11,4 @@ import java.util.Map;
 public interface HttpExecuter {
 	String get(Map<String,String> map) throws MalformedURLException ;
 	<T extends Object> String post(T t);
-	<T> String delete(T t);
-	<T extends Object> String put(T t);
 }
