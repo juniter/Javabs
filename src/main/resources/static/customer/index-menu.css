@@ -185,7 +185,7 @@ nav ul, nav li {
 
 .main-menu:hover+div.main-wrapper>div.d3-wrapper{
 	-webkit-transform: translate3d(100px, 0, -600px) rotateY(-20deg);
-	transform: translate3d(100px, 0, -600px) rotateY(-10deg);
+	transform: translate3d(100px, 0, -600px) rotateY(-20deg);
 }
 
 .d3-wrapper{

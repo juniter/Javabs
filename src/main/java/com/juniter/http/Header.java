@@ -3,8 +3,6 @@ package com.juniter.http;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Http Header
  * 
