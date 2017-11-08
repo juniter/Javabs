@@ -8,14 +8,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HttpClient implements HttpExecuter {
 
 	private static final Logger logger = LoggerFactory.getLogger("HTTP_REQUEST_LOGGER");
@@ -24,19 +25,23 @@ public class HttpClient implements HttpExecuter {
 	private URL realURL;
 	private Header requestHeader;
 
+	/**
+	 * @author Juniter Http Get Method
+	 * @param parameters map
+	 * 
+	 */
 	@Override
 	public String get(Map<String, String> map) throws MalformedURLException {
-		logger.info("Request Method:{}", HttpMethod.GET);
+		logger.info("Request Method:  {}", HttpMethod.GET);
 		BufferedReader in = null;
 		StringBuffer response = new StringBuffer();
-		this.setRealURL(map);
+		this.setGetMethodURL(map);
 		try {
 			this.connection = this.realURL.openConnection();
 			this.setHeader(this.requestHeader);
 			this.connection.connect();
 			this.logResponseHeader(connection.getHeaderFields());
-			System.out.println("####################\nXXXX:{}"+this.realURL.toString());
-			in = new BufferedReader(new InputStreamReader(this.connection.getInputStream(),"UTF-8"));
+			in = new BufferedReader(new InputStreamReader(this.connection.getInputStream(), "UTF-8"));
 			String metedata;
 			while ((metedata = in.readLine()) != null)
 				response.append(metedata);
@@ -50,7 +55,7 @@ public class HttpClient implements HttpExecuter {
 				logger.warn("Failed to close InputStream:{}", e1.getMessage());
 			}
 		}
-		logger.info("Response:{}",response.toString());
+		logger.info("The Server Response: {}", response.toString());
 		return response.toString();
 	}
 
@@ -82,7 +87,7 @@ public class HttpClient implements HttpExecuter {
 		keySet.forEach((key) -> {
 			this.connection.setRequestProperty(key, headerMap.get(key));
 		});
-		logger.info("Accept:{}\nAccept-Encoding:{}\nUser-Agent:{}\nConnection:{}", header.getAccept(),
+		logger.info("RequestHeader\nAccept:  {}\nAccept-Encoding:  {}\nUser-Agent:  {}\nConnection:  {}", header.getAccept(),
 				header.getAcceptEncoding(), header.getUserAgent(), header.getConnection());
 		return this;
 	}
@@ -97,45 +102,67 @@ public class HttpClient implements HttpExecuter {
 	}
 
 	/**
-	 * Set Real Request URL
-	 * 对空格进行编码，对请求进行编码吗
+	 * Set Real Request URL 对空格进行编码，对请求进行编码吗
 	 * 
 	 * @param url
 	 * @throws MalformedURLException
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 * 
 	 * 
 	 */
-	private void setRealURL(Map<String, String> params) throws MalformedURLException{
+	private void setGetMethodURL(Map<String, String> params) throws MalformedURLException {
 		if (params != null) {
 			StringBuffer urlBuffer = new StringBuffer(url);
 			urlBuffer.append("?");
 			Set<String> keySet = params.keySet();
 			keySet.forEach((key) -> {
-				try {
-					urlBuffer.append(key).append("=%22").append(URLEncoder.encode(params.get(key), "UTF-8")).append("%22&");
-				} catch (UnsupportedEncodingException e) {
-					logger.warn("Failed To Encode URL:{}",e.getMessage());
-				}
+				String encodeParam = this.getEncodeURLParam(params.get(key));
+				urlBuffer.append(key).append("=").append(encodeParam).append("&");
 			});
-			urlBuffer.append("dc_").append("=%22").append(System.currentTimeMillis()).append("%22");
+			this.setRandomParameter(urlBuffer);
 			this.realURL = new URL(urlBuffer.toString());
-			logger.info("Request URL:{}", urlBuffer.toString());
-		} else {
+		} else
 			this.realURL = new URL(url);
-			logger.info("Request URL:{}", url);
-		}
+		logger.info("Request URL:{}", this.realURL.toExternalForm());
 
 	}
 
+	/**
+	 * Encode request parameters
+	 * 
+	 * @param param
+	 * @return
+	 * 
+	 */
+	private String getEncodeURLParam(String param) {
+		StringBuffer temp = new StringBuffer("%22");
+		try {
+			String value = URLEncoder.encode(param, "UTF-8");
+			// add %22 block
+			temp.append(value).append("%22");
+		} catch (UnsupportedEncodingException e) {
+			logger.warn("Failed To Encode URL:{}", e.getMessage());
+		}
+		return temp.toString();
+	}
+
+	/**
+	 * set random parameter to avoid http cache
+	 * 
+	 * @param buffer
+	 */
+	private void setRandomParameter(StringBuffer buffer) {
+		buffer.append("dc_").append("=%22").append(System.nanoTime()).append("%22");
+	}
+
 	private void logResponseHeader(Map<String, List<String>> map) {
-		if(map!=null) {
+		if (map != null) {
 			Set<String> keySet = map.keySet();
 			keySet.forEach((rh) -> {
-				if(rh==null)
-					logger.info("{HTTP}:{}", map.get("null"));
+				if (rh == null)
+					logger.info("HTTP:  {}", map.get(null));
 				else
-					logger.info("{}:{}", rh, map.get(rh.toString()));
+					logger.info("{}:  {}", rh, map.get(rh.toString()));
 			});
 		}
 	}

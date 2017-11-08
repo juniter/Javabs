@@ -15,9 +15,7 @@ public class HttpClientTest {
 		map.put("password", "Juniter sPa ssword");
 		HttpClient client = new HttpClient();
 		String response = client.setUrl("http://localhost:8088/test/example").setRequestHeader(new Header()).get(map);
-		System.out.println("#######################");
 		System.out.println(response);
-		System.out.println("#######################");
 	}
 
 }

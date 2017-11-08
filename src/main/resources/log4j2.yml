@@ -15,6 +15,14 @@ Configuration:
         pattern: |
           %style{%date{DEFAULT}}{yellow}%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green}%message
     File:
+    - name: HTTP_REQUEST_LOGGER
+      fileName: ${filename}-http.log
+      PatternLayout:
+        pattern: |
+          %date-%-5level-%message
+      Filters:
+        ThresholdFilter:
+          level: INFO
     - name: DefaultFileAppender
       fileName: ${filename}-all.log
       PatternLayout:
@@ -22,7 +30,7 @@ Configuration:
           %date-%-5level-%message
       Filters:
         ThresholdFilter:
-          level: info
+          level: INFO
     - name: WarnningFileAppender
       fileName: ${filename}-warn.log
       PatternLayout:
@@ -30,7 +38,7 @@ Configuration:
           %date-%-5level-%message
       Filters:
         ThresholdFilter:
-          level: warn
+          level: WARN
     RollingFile:
     - name: ArchiveFileAppender
       fileName: ${filename}-rolling.log
@@ -42,13 +50,16 @@ Configuration:
           size: 10 MB
   Loggers:
     Root:
-      level: TRACE
+      level: INFO
       AppenderRef:
       - ref: DefaultConsoleAppender
       - ref: DefaultFileAppender
       - ref: WarnningFileAppender
       - ref: ArchiveFileAppender
     Logger:
-      name: SYNC_FILE_LOGGER
-      level: warn
+    - name: HTTP_REQUEST_LOGGER
+      level: INFO
+      additivity: true
+    - name: SYNC_FILE_LOGGER
+      level: WARN
       additivity: true

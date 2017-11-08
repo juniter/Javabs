@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  * @author Juniter
  *
  */
-@Component
 public class Header {
 	private String accept = "*/*";
 	private String acceptEncoding = "gzip,deflate,br";
