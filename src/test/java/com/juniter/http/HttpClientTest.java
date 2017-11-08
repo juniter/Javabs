@@ -1,6 +1,5 @@
 package com.juniter.http;
 
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +8,7 @@ import org.junit.Test;
 public class HttpClientTest {
 
 	@Test
-	public void testGet() throws MalformedURLException {
+	public void testGet(){
 		Map<String,String> map = new HashMap<>();
 		map.put("name", "Juniter");
 		map.put("password", "Juniter sPa ssword");

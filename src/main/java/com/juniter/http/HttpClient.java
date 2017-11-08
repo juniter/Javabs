@@ -3,6 +3,7 @@ package com.juniter.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
+
 @Component
 public class HttpClient implements HttpExecuter {
 
@@ -24,44 +27,82 @@ public class HttpClient implements HttpExecuter {
 	private String url;
 	private URL realURL;
 	private Header requestHeader;
+	private HttpMethod currentMethod;
 
 	/**
 	 * @author Juniter Http Get Method
-	 * @param parameters map
-	 * 
+	 * @param parameters
+	 *            map
 	 */
 	@Override
-	public String get(Map<String, String> map) throws MalformedURLException {
+	public String get(Map<String, String> map) {
+		this.currentMethod = HttpMethod.GET;
 		logger.info("Request Method:  {}", HttpMethod.GET);
-		BufferedReader in = null;
+		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
-		this.setGetMethodURL(map);
 		try {
+			this.setGetMethodURL(map);
 			this.connection = this.realURL.openConnection();
 			this.setHeader(this.requestHeader);
 			this.connection.connect();
 			this.logResponseHeader(connection.getHeaderFields());
-			in = new BufferedReader(new InputStreamReader(this.connection.getInputStream(), "UTF-8"));
+			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream(), "UTF-8"));
 			String metedata;
-			while ((metedata = in.readLine()) != null)
+			while ((metedata = reader.readLine()) != null)
 				response.append(metedata);
 		} catch (IOException e) {
-			logger.warn("An error has occured while sent GET request:{}", e.getMessage());
+			logger.warn("AN ERROR HAS OCCURED WHILE SENT HTTP-GET REQUEST:{}", e.getMessage());
 		} finally {
 			try {
-				if (in != null)
-					in.close();
+				if (reader != null)
+					reader.close();
 			} catch (IOException e1) {
-				logger.warn("Failed to close InputStream:{}", e1.getMessage());
+				logger.warn("FAILED TO CLOSE INPUTSTREAM:{}", e1.getMessage());
 			}
 		}
-		logger.info("The Server Response: {}", response.toString());
+		logger.info("SERVER RESPONSE: {}", response.toString());
 		return response.toString();
 	}
 
+	/**
+	 * @author Juniter
+	 * @description http post method
+	 * @param T
+	 */
 	@Override
 	public <T> String post(T t) {
-		return null;
+		logger.info("Request Method:  {}", HttpMethod.POST);
+		logger.info("URL:{}",this.url);
+		this.currentMethod = HttpMethod.POST;
+		PrintWriter printer = null;
+		BufferedReader reader = null;
+		StringBuffer response = new StringBuffer();
+		try {
+			this.realURL = new URL(this.url);
+			this.connection = this.realURL.openConnection();
+			this.setHeader(this.requestHeader);
+			printer = new PrintWriter(this.connection.getOutputStream());
+			// send json request
+			printer.print(new Gson().toJson(t));
+			printer.flush();
+			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream()));
+			String metedata;
+			while ((metedata = reader.readLine()) != null)
+				response.append(metedata);
+		} catch (IOException e) {
+			logger.warn("AN ERROR HAS OCCURED WHILE SENT HTTP-POST REQUEST:{}", e.getMessage());
+		} finally {
+			try {
+				if (reader != null)
+					reader.close();
+				if (printer != null)
+					printer.close();
+			} catch (IOException e1) {
+				logger.warn("FAILED TO CLOSE INPUTSTREAM:{}", e1.getMessage());
+			}
+		}
+		logger.info("SERVER RESPONSE: {}", response.toString());
+		return response.toString();
 	}
 
 	@Override
@@ -87,8 +128,14 @@ public class HttpClient implements HttpExecuter {
 		keySet.forEach((key) -> {
 			this.connection.setRequestProperty(key, headerMap.get(key));
 		});
-		logger.info("RequestHeader\nAccept:  {}\nAccept-Encoding:  {}\nUser-Agent:  {}\nConnection:  {}", header.getAccept(),
-				header.getAcceptEncoding(), header.getUserAgent(), header.getConnection());
+		
+		if (this.currentMethod.equals(HttpMethod.POST)) {
+			this.connection.setRequestProperty("Content-Type", header.getContentType());
+			this.connection.setDoOutput(true);
+			this.connection.setDoInput(true);
+		}
+		
+		logger.info("HEADER:\n\tAccept:  {}\n\tAccept-Encoding:  {}\n\tUser-Agent:  {}\n\tConnection:  {}\n\tContent-Type:  {}",header.getAccept(), header.getAcceptEncoding(), header.getUserAgent(), header.getConnection(),header.getContentType());
 		return this;
 	}
 
@@ -102,7 +149,6 @@ public class HttpClient implements HttpExecuter {
 	}
 
 	/**
-	 * Set Real Request URL 对空格进行编码，对请求进行编码吗
 	 * 
 	 * @param url
 	 * @throws MalformedURLException
@@ -123,7 +169,7 @@ public class HttpClient implements HttpExecuter {
 			this.realURL = new URL(urlBuffer.toString());
 		} else
 			this.realURL = new URL(url);
-		logger.info("Request URL:{}", this.realURL.toExternalForm());
+		logger.info("URL:{}", this.realURL.toExternalForm());
 
 	}
 
@@ -141,7 +187,7 @@ public class HttpClient implements HttpExecuter {
 			// add %22 block
 			temp.append(value).append("%22");
 		} catch (UnsupportedEncodingException e) {
-			logger.warn("Failed To Encode URL:{}", e.getMessage());
+			logger.warn("FAILED ENCODE PARAM:{}, CAUSE FOR:", param,e.getMessage());
 		}
 		return temp.toString();
 	}

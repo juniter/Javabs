@@ -15,7 +15,7 @@ Configuration:
         pattern: |
           %style{%date{DEFAULT}}{yellow}%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green}%message
     File:
-    - name: HTTP_REQUEST_LOGGER
+    - name: HTTP_REQUEST_LOG
       fileName: ${filename}-http.log
       PatternLayout:
         pattern: |
@@ -48,6 +48,9 @@ Configuration:
       Policies:
         SizeBasedTriggeringPolicy:
           size: 10 MB
+        TimeBasedTriggeringPolicy:
+          interval: 1
+          modulate: true
   Loggers:
     Root:
       level: INFO
@@ -60,6 +63,8 @@ Configuration:
     - name: HTTP_REQUEST_LOGGER
       level: INFO
       additivity: true
+      AppenderRef:
+        ref: HTTP_REQUEST_LOG
     - name: SYNC_FILE_LOGGER
       level: WARN
       additivity: true

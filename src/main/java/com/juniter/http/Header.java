@@ -16,6 +16,16 @@ public class Header {
 	private String acceptEncoding = "gzip,deflate,br";
 	private String connection = "keep-alive";
 	private String userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36";
+	//Content-Type
+	private String contentType="application/json";
+	
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
 
 	public String getAccept() {
 		return accept;
