@@ -29,15 +29,10 @@ public class HttpClient implements HttpExecuter {
 	private Header requestHeader;
 	private HttpMethod method;
 
-	/**
-	 * @author Juniter Http Get Method
-	 * @param parameters
-	 *            map
-	 */
 	@Override
 	public String get(Map<String, String> map) {
 		this.method = HttpMethod.GET;
-		logger.info("Request Method:  {}", HttpMethod.GET);
+		logger.info("REQUEST METHOD:  {}", HttpMethod.GET);
 		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
 		try {
@@ -64,25 +59,19 @@ public class HttpClient implements HttpExecuter {
 		return response.toString();
 	}
 
-	/**
-	 * @author Juniter
-	 * @description http post method
-	 * @param T
-	 */
 	@Override
 	public <T> String post(T t) {
-		logger.info("Request Method:  {}", HttpMethod.POST);
-		logger.info("URL:{}", this.url);
+		logger.info("REQUEST METHOD:  {}", HttpMethod.POST);
 		this.method = HttpMethod.POST;
 		PrintWriter printer = null;
 		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
+		logger.info("URL:{}", this.url);
 		try {
 			this.realURL = new URL(this.url);
 			this.connection = this.realURL.openConnection();
 			this.initHeader();
 			printer = new PrintWriter(this.connection.getOutputStream());
-			// send json request
 			printer.print(new Gson().toJson(t));
 			printer.flush();
 			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream()));
@@ -105,13 +94,6 @@ public class HttpClient implements HttpExecuter {
 		return response.toString();
 	}
 
-	/**
-	 * set request header
-	 * 
-	 * @param header
-	 * @return
-	 * 
-	 */
 	private void initHeader() {
 		Map<String, String> headerMap = this.requestHeader.getCommonHeaderMap();
 		Set<String> keySet = headerMap.keySet();
@@ -125,10 +107,6 @@ public class HttpClient implements HttpExecuter {
 		this.logRequestHeader();
 	}
 
-	/**
-	 * log request logger
-	 * 
-	 */
 	private void logRequestHeader() {
 		Map<String, String> headerMap = this.requestHeader.getAllHeaderMap();
 		Set<String> keySet = headerMap.keySet();
@@ -137,31 +115,15 @@ public class HttpClient implements HttpExecuter {
 		});
 	}
 
-	/**
-	 * 
-	 * set post method header
-	 * 
-	 */
 	private void initPOSTHeader() {
 		this.connection.setRequestProperty("Content-Type", this.requestHeader.getContentType());
 		this.connection.setDoOutput(true);
 		this.connection.setDoInput(true);
 	}
 
-	/**
-	 * set get method header
-	 */
 	private void initGETHeader() {
 	}
 
-	/**
-	 * 
-	 * @param url
-	 * @throws MalformedURLException
-	 * @throws UnsupportedEncodingException
-	 * 
-	 * 
-	 */
 	private void setGetMethodURL(Map<String, String> params) throws MalformedURLException {
 		if (params != null) {
 			StringBuffer urlBuffer = new StringBuffer(url);
@@ -179,13 +141,6 @@ public class HttpClient implements HttpExecuter {
 
 	}
 
-	/**
-	 * Encode request parameters
-	 * 
-	 * @param param
-	 * @return
-	 * 
-	 */
 	private String encodeRequestParams(String param) {
 		StringBuffer temp = new StringBuffer("%22");
 		try {
@@ -197,11 +152,6 @@ public class HttpClient implements HttpExecuter {
 		return temp.toString();
 	}
 
-	/**
-	 * set random parameter to avoid http cache
-	 * 
-	 * @param buffer
-	 */
 	private void setRandomParameter(StringBuffer buffer) {
 		buffer.append("dc_").append("=%22").append(System.nanoTime()).append("%22");
 	}
@@ -209,29 +159,18 @@ public class HttpClient implements HttpExecuter {
 	private void logResponseHeader(Map<String, List<String>> map) {
 		Set<String> keySet = map.keySet();
 		keySet.forEach((rh) -> {
-			if (rh==null)
+			if (rh == null)
 				logger.info("HTTP:  {}", map.get(rh));
 			else
-				logger.info(rh.toUpperCase()+": {}",map.get(rh));
+				logger.info(rh.toUpperCase() + ": {}", map.get(rh));
 		});
 	}
 
-	/**
-	 * Set Origin URL Without Parameters
-	 * 
-	 * @param url
-	 */
 	public HttpClient setUrl(String url) {
 		this.url = url;
 		return this;
 	}
 
-	/**
-	 * Set Request Header
-	 * 
-	 * @param requestHeader
-	 * @return
-	 */
 	public HttpClient setRequestHeader(Header requestHeader) {
 		this.requestHeader = requestHeader;
 		return this;
