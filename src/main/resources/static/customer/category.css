@@ -1,0 +1,35 @@
+.java {
+	width: 13rem;
+	margin: 30px 10px 10px 30px;
+	padding-top:0.5rem;
+}
+
+.spring {
+	width: 25rem;
+	height: 26.5rem;
+	margin: 30px 0 0 10px;
+}
+
+.small-card-container{
+	width: 23.5rem;
+	margin: 26px 10px 10px 10px;
+}
+div.spring img {
+	width:80%;
+	padding-top:10px;
+}
+.mysql {
+	width: 23rem;
+	background-image: url(/img/mysql-yellow.png);
+	background-repeat: no-repeat;
+	background-position: bottom right;
+	margin: 5px;
+}
+
+.linux{
+	width: 23rem;
+	background-image: url(/img/red-hat.png);
+	background-repeat: no-repeat;
+	background-position: top right;
+	margin: 13px 5px;
+}

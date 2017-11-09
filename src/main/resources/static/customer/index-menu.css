@@ -172,9 +172,9 @@ nav ul, nav li {
 	width:95%;
 	overflow: hidden;
 	opacity: 1;
-	left:54px;
+	left:20px;
 	position: relative;
-	padding:20px 0 20px 20px;
+	padding:10px 0 0 20px;
 	-webkit-transition: all 0.1s linear;
 	transition: all 0.1s linear;
 	-webkit-transform: translateZ(0) scale(1, 1);
@@ -195,7 +195,7 @@ nav ul, nav li {
 	z-index: 99;
 	height: 100%;
 	overflow:auto;
-	background-color:#eaeaea;
+	/* background-color:#eaeaea; */
 	-webkit-transition: -webkit-transform 0.6s;
 	transition: transform 0.6s;
 }
