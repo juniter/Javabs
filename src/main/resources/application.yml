@@ -11,5 +11,11 @@ spring:
     username: admin
     password: admin
     driver-class-name: com.mysql.jdbc.Driver
+logging:
+  level:
+    root: INFO
+    com:
+      juniter:
+       mapper: TRACE
 juniter:
   email: juniterr@outlook.com
