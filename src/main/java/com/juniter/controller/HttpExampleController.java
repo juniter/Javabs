@@ -38,7 +38,7 @@ public class HttpExampleController {
 	@RequestMapping(value = "/example/post", method = RequestMethod.POST)
 	public void examplePost(HttpServletResponse response, @RequestBody HttpExample body) throws IOException {
 		logger.info("POST REQUEST: {}",body.toString());
-		response.getWriter().write("SERVER SIDE RECEIVED YOUR REQUEST!");
+		response.getWriter().write("SERVER SIDE RECEIVED YOUR REQUEST!接收到来自服务端的信息返回");
 	}
 	
 	@RequestMapping(value= "/send")

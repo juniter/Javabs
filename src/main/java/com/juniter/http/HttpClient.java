@@ -3,6 +3,7 @@ package com.juniter.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -63,7 +64,7 @@ public class HttpClient implements HttpExecuter {
 	public <T> String post(T t) {
 		logger.info("REQUEST METHOD:  {}", HttpMethod.POST);
 		this.method = HttpMethod.POST;
-		PrintWriter printer = null;
+		OutputStreamWriter printer = null;
 		BufferedReader reader = null;
 		StringBuffer response = new StringBuffer();
 		logger.info("URL:{}", this.url);
@@ -71,10 +72,12 @@ public class HttpClient implements HttpExecuter {
 			this.realURL = new URL(this.url);
 			this.connection = this.realURL.openConnection();
 			this.initHeader();
-			printer = new PrintWriter(this.connection.getOutputStream());
-			printer.print(new Gson().toJson(t));
+			this.connection.connect();
+			printer = new OutputStreamWriter(this.connection.getOutputStream(),"UTF-8");
+			printer.write(new Gson().toJson(t));
 			printer.flush();
-			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream()));
+			this.logResponseHeader(connection.getHeaderFields());
+			reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream(), "UTF-8"));
 			String metedata;
 			while ((metedata = reader.readLine()) != null)
 				response.append(metedata);
@@ -142,14 +145,19 @@ public class HttpClient implements HttpExecuter {
 	}
 
 	private String encodeRequestParams(String param) {
-		StringBuffer temp = new StringBuffer("%22");
 		try {
-			String value = URLEncoder.encode(param, "UTF-8");
-			temp.append(value).append("%22");
-		} catch (UnsupportedEncodingException e) {
-			logger.warn("FAILED ENCODE PARAM:{}, CAUSE FOR:", param, e.getMessage());
+			Double.valueOf(param);
+			return param;
+		} catch (NumberFormatException e) {
+			StringBuffer temp = new StringBuffer("%22");
+			try {
+				String value = URLEncoder.encode(param, "UTF-8");
+				return temp.append(value).append("%22").toString();
+			} catch (UnsupportedEncodingException eu) {
+				logger.warn("FAILED ENCODE PARAM:{}, CAUSE FOR:", param, eu.getMessage());
+			}
 		}
-		return temp.toString();
+		return null;
 	}
 
 	private void setRandomParameter(StringBuffer buffer) {

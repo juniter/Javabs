@@ -15,7 +15,8 @@ public class Header {
 	private String connection = "keep-alive";
 	private String userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36";
 	//Content-Type
-	private String contentType="application/json";
+	private String contentType="application/json-patch+json;charset=UTF-8";
+	private String acceptCharset = "UTF-8";
 	
 	public String getContentType() {
 		return contentType;
@@ -23,6 +24,14 @@ public class Header {
 
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+
+	public String getAcceptCharset() {
+		return acceptCharset;
+	}
+
+	public void setAcceptCharset(String acceptCharset) {
+		this.acceptCharset = acceptCharset;
 	}
 
 	public String getAccept() {
@@ -68,6 +77,7 @@ public class Header {
 		map.put("Accept-Encoding", this.acceptEncoding);
 		map.put("User-Agent", this.acceptEncoding);
 		map.put("Connection", this.userAgent);
+		map.put("Accept-Charset", this.acceptCharset);
 		return map;
 	}
 	
