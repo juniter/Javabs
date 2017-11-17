@@ -5,7 +5,10 @@ import java.net.URLEncoder;
 
 public class JuniterTestClass {
 	public static void main(String args[]) {
-		System.out.println(isInteger("1a22.7"));;
+		String a ="1243";
+		Double b = 112.;
+		chage(a,b);
+		System.out.println(a+"-"+b);
 	}
 	 public static String isInteger(String param) {
 		 String result = null;
@@ -21,5 +24,9 @@ public class JuniterTestClass {
 				}
 			}
 			return null;
+	 }
+	 public static void chage(String a,Double b) {
+		 a = "welcome";
+		 b = 2323.;
 	 }
 }
